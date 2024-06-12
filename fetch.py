@@ -1,23 +1,31 @@
 from scholarly import scholarly
 import pickle
 
+DATA_PATH = "data/"
 org = scholarly.search_org("University of Bahrain")
 authors = scholarly.search_author_by_organization(org[0]['id'])
 
-with open("authors.txt", "w") as f:
-    for author in authors:
-        f.write(str(author))
-        f.write("\n")
+authors_details = []
+author_index = 1
+for author in authors:
+    author_details = scholarly.fill(author)
+    print(f"author {author_index}: {author_details['name']}")
+    authors_details.append(author_details)
+    author_index += 1
 
-# with open('authors.pkl', 'wb') as outp:
-#     pickle.dump(authors, outp, pickle.HIGHEST_PROTOCOL)
+with open(DATA_PATH + 'authors.pkl', 'wb') as out:
+    pickle.dump(authors_details, out, pickle.HIGHEST_PROTOCOL)
 
+author_index = 1
+publications = []
+for author in authors:
+    print(f"author {author_index}: {author_details['name']}")
+    publication_index = 1
+    for publication in author_details["publications"]:
+        publication_details = scholarly.fill(publication)
+        print(f"\tpublication {publication_index}: {publication_details['bib']['title']}")
+        publications.append(publication_details)
+        publication_index += 1
 
-# for i in range(1, 6):
-#     author = next(authors)
-#     scholarly.pprint(author)
-#     author_details = scholarly.fill(author)
-#     scholarly.pprint(author_details)
-#     publications = author_details["publications"][0]
-#     pub_details = scholarly.fill(publications)
-#     scholarly.pprint(pub_details)
+    with open('publications.pkl', 'wb') as out:
+        pickle.dump(publications, out, pickle.HIGHEST_PROTOCOL)
